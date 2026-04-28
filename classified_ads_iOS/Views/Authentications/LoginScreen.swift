@@ -23,8 +23,7 @@ struct LoginScreen: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
                             
-                            LoginHeaderView()
-                                .offset(y: -geo.safeAreaInsets.top)
+                            LogoSectionView(title: "Welcome Back", subtitle: "Sign in to continue")
                             
                             // Form
                             VStack(spacing: 16) {
@@ -99,69 +98,6 @@ struct LoginScreen: View {
     }
 }
 
-struct LoginHeaderView: View {
-    @State private var float = false
-    
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            
-            AppGradient.brandPrimary
-                .clipShape(WaveBottomShape())
-                .frame(height: 320)
-                .overlay(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.18),
-                            Color.clear
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-            
-            // Ambient shapes
-            Circle()
-                .fill(Color.white.opacity(0.06))
-                .frame(width: 220, height: 220)
-                .offset(x: 140, y: float ? -60 : -90)
-                .animation(.easeInOut(duration: 6).repeatForever(autoreverses: true), value: float)
-            
-            Circle()
-                .fill(Color.accentOrange.opacity(0.18))
-                .frame(width: 120, height: 120)
-                .offset(x: -130, y: float ? 10 : 40)
-            //                .animation(.easeInOut(duration: 5).repeatForever(autoreverses: true), value: float)
-            
-            // Content
-            VStack(spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 66, height: 66)
-                        .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
-                    
-                    Image(systemName: "square.grid.2x2.fill")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.white)
-                }
-                .offset(y: float ? -6 : 6)
-                //                .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: float)
-                
-                Text("Welcome back")
-                    .font(AppFont.display(28))
-                    .foregroundStyle(.white)
-                
-                Text("Sign in to continue")
-                    .font(AppFont.body(14))
-                    .bold()
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-            .padding(.bottom, 46)
-        }
-        .ignoresSafeArea(edges: .top)
-        .onAppear { float = true }
-    }
-}
 
 struct WaveBottomShape: Shape {
     func path(in rect: CGRect) -> Path {
@@ -200,7 +136,6 @@ struct SocialLoginButton: View {
             .background(Color.surfaceCard)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.textTertiary.opacity(0.3), lineWidth: 1))
-            .subtleShadow()
         }
         .buttonStyle(.plain)
     }
