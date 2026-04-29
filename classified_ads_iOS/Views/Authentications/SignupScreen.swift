@@ -5,6 +5,8 @@
 //  Created by iOS Developer on 26/04/26.
 //
 import SwiftUI
+import CoreLocation
+
 // MARK: - Signup Screen
 struct SignupScreen: View {
     @State private var step = 0
@@ -25,7 +27,9 @@ struct SignupScreen: View {
     @State private var resendTimer: Int = 0
     @State private var canResend = false
     @State private var keyboardHeight: CGFloat = 0
-    
+  
+     @State private var userCoordinate: CLLocationCoordinate2D?
+
     private var otpDigits: [String] {
         let chars = Array(enteredOTP.prefix(6))
         return (0..<6).map { i in i < chars.count ? String(chars[i]) : "" }
@@ -125,14 +129,15 @@ struct SignupScreen: View {
                     onContinue: { moveToNextStep() }
                 )
             } else if step == 1 {
-                Step1View(
-                    stateName: $stateName,
-                    city: $city,
-                    pincode: $pincode,
-                    locality: $locality,
-                    onContinue: { moveToNextStep() },
-                    onBack: { moveToPreviousStep() }
-                )
+                 Step1View(
+                     stateName: $stateName,
+                     city: $city,
+                     pincode: $pincode,
+                     locality: $locality,
+                     userCoordinate: $userCoordinate,
+                     onContinue: { moveToNextStep() },
+                     onBack: { moveToPreviousStep() }
+                 )
             } else {
                 Step2View(
                     email: email,
@@ -317,127 +322,6 @@ struct Step0View: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color(hex: "#4F5BDB"))
             }
-        }
-    }
-}
-
-// MARK: - Step 1 View
-struct Step1View: View {
-    @Binding var stateName: String
-    @Binding var city: String
-    @Binding var pincode: String
-    @Binding var locality: String
-    
-    @StateObject private var locationManager = SimpleLocationManager()
-    @State private var isUsingGPS = false
-    @State private var showLocationPrompt = false
-    
-    let onContinue: () -> Void
-    let onBack: () -> Void
-    
-    var isFormValid: Bool {
-        !stateName.isEmpty && !city.isEmpty && pincode.count >= 6
-    }
-    
-    var body: some View {
-        VStack(spacing: 28) {
-            FloatingField(
-                label: "State",
-                placeholder: "Select your state",
-                icon: "map.fill",
-                text: $stateName
-            )
-            
-            FloatingField(
-                label: "City / District",
-                placeholder: "Enter your city",
-                icon: "building.2.fill",
-                text: $city
-            )
-            
-            FloatingField(
-                label: "Pincode",
-                placeholder: "Enter 6-digit pincode",
-                icon: "mappin.circle.fill",
-                text: $pincode,
-                keyboardType: .numberPad
-            )
-            
-            FloatingField(
-                label: "Locality / Area",
-                placeholder: "Optional",
-                icon: "location.fill",
-                text: $locality
-            )
-            
-            // Location hint
-            HStack(spacing: 8) {
-                Image(systemName: "location.north.circle.fill")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "#4F5BDB"))
-                
-                Text("Pincode helps rank your ads to nearby buyers first")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color(hex: "#5A5F8A"))
-                
-                Spacer()
-            }
-            .padding(.top, 8)
-            
-            // Buttons
-            VStack(spacing: 12) {
-                GradientButton(
-                    title: "Continue",
-                    isEnabled: isFormValid,
-                    action: onContinue
-                )
-                
-                OutlineButton(
-                    title: "Back",
-                    action: onBack
-                )
-            }
-            .padding(.top, 16)
-            Button(action: {
-                locationManager.requestPermission()
-                showLocationPrompt = true
-            }) {
-                HStack {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 16))
-                    Text("Use my current location")
-                        .font(.system(size: 15, weight: .medium))
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
-                }
-                .foregroundColor(Color(hex: "#4F5BDB"))
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(hex: "#F0F1FF"))
-                )
-            }
-            
-            // Show GPS result if available
-            if !locationManager.locationName.isEmpty {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                    Text("Detected: \(locationManager.locationName)")
-                        .font(.caption)
-                        .foregroundColor(Color(hex: "#5A5F8A"))
-                }
-                .padding(.top, 8)
-            }
-        }
-        .alert("Enable Location?", isPresented: $showLocationPrompt) {
-            Button("Allow") {
-                locationManager.getCurrentLocation()
-            }
-            Button("Not Now", role: .cancel) { }
-        } message: {
-            Text("We'll use your location to show nearby listings")
         }
     }
 }
