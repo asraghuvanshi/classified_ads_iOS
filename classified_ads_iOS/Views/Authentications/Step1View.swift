@@ -6,19 +6,20 @@
 //
 
 import SwiftUI
-
+import CoreLocation
+import MapKit
 
 struct Step1View: View {
     @Binding var stateName: String
     @Binding var city: String
     @Binding var pincode: String
     @Binding var locality: String
- 
+    
     @Binding var userCoordinate: CLLocationCoordinate2D?
- 
+    
     let onContinue: () -> Void
     let onBack: () -> Void
- 
+    
     // Search state
     @StateObject private var searchManager = LocationSearchManager()
     @StateObject private var locationManager = CurrentLocationManager()
@@ -27,21 +28,21 @@ struct Step1View: View {
     @State private var isResolvingLocation = false
     @State private var locationConfirmed = false
     @FocusState private var searchFieldFocused: Bool
- 
+    
     var isFormValid: Bool {
         !stateName.isEmpty && !city.isEmpty && pincode.count >= 6
     }
- 
+    
     var body: some View {
         VStack(spacing: 24) {
- 
+            
             // MARK: Location Search Field
             VStack(alignment: .leading, spacing: 6) {
                 Text("SEARCH LOCATION")
                     .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(Color(hex: "#9499C4"))
                     .tracking(1.5)
- 
+                
                 HStack(spacing: 10) {
                     Image(systemName: locationConfirmed ? "checkmark.circle.fill" : "magnifyingglass")
                         .font(.system(size: 15))
@@ -49,7 +50,7 @@ struct Step1View: View {
                             locationConfirmed ? Color(hex: "#00C9A7") : Color(hex: "#9499C4")
                         )
                         .animation(.spring(response: 0.3), value: locationConfirmed)
- 
+                    
                     TextField("Type city, area or pincode…", text: $locationQuery)
                         .font(.system(size: 15))
                         .foregroundStyle(Color(hex: "#0D0F2B"))
@@ -59,7 +60,7 @@ struct Step1View: View {
                             searchManager.search(query: newValue)
                             showSuggestions = !newValue.isEmpty
                         }
- 
+                    
                     if !locationQuery.isEmpty {
                         Button {
                             clearSearch()
@@ -69,7 +70,7 @@ struct Step1View: View {
                                 .foregroundStyle(Color(hex: "#C8CCEE"))
                         }
                     }
- 
+                    
                     if isResolvingLocation || searchManager.isSearching {
                         ProgressView()
                             .scaleEffect(0.7)
@@ -91,7 +92,7 @@ struct Step1View: View {
                                 )
                         )
                 )
- 
+                
                 // MARK: Suggestions Dropdown
                 if showSuggestions && !searchManager.suggestions.isEmpty {
                     VStack(spacing: 0) {
@@ -100,7 +101,7 @@ struct Step1View: View {
                                 .onTapGesture {
                                     selectSuggestion(suggestion)
                                 }
- 
+                            
                             if suggestion != searchManager.suggestions.prefix(5).last {
                                 Divider()
                                     .padding(.leading, 44)
@@ -121,7 +122,7 @@ struct Step1View: View {
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: searchManager.suggestions.count)
                 }
             }
- 
+            
             // MARK: Auto-filled Fields (read-only, pre-filled from selection)
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
@@ -136,7 +137,7 @@ struct Step1View: View {
                         icon: "building.2.fill"
                     )
                 }
- 
+                
                 HStack(spacing: 12) {
                     AutoFilledField(
                         label: "Pincode",
@@ -152,20 +153,20 @@ struct Step1View: View {
             }
             .opacity(locationConfirmed ? 1 : 0.4)
             .animation(.easeInOut(duration: 0.3), value: locationConfirmed)
- 
+            
             // MARK: Coordinate badge
             if let coord = userCoordinate {
                 HStack(spacing: 8) {
                     Image(systemName: "location.circle.fill")
                         .font(.system(size: 13))
                         .foregroundStyle(Color(hex: "#00C9A7"))
- 
+                    
                     Text(String(format: "%.4f°, %.4f°", coord.latitude, coord.longitude))
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
                         .foregroundStyle(Color(hex: "#5A5F8A"))
- 
+                    
                     Spacer()
- 
+                    
                     Text("Location saved")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Color(hex: "#00C9A7"))
@@ -183,20 +184,20 @@ struct Step1View: View {
                 .transition(.scale.combined(with: .opacity))
                 .animation(.spring(response: 0.4), value: userCoordinate != nil)
             }
- 
+            
             // MARK: Location hint
             HStack(spacing: 8) {
                 Image(systemName: "location.north.circle.fill")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(hex: "#4F5BDB"))
- 
+                
                 Text("Pincode helps rank your ads to nearby buyers first")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color(hex: "#5A5F8A"))
- 
+                
                 Spacer()
             }
- 
+            
             // MARK: Current Location Button
             Button {
                 requestCurrentLocation()
@@ -224,7 +225,7 @@ struct Step1View: View {
                 )
             }
             .disabled(locationManager.isLoading)
- 
+            
             // MARK: Action Buttons
             VStack(spacing: 12) {
                 GradientButton(
@@ -232,7 +233,7 @@ struct Step1View: View {
                     isEnabled: isFormValid,
                     action: onContinue
                 )
- 
+                
                 OutlineButton(
                     title: "Back",
                     action: onBack
@@ -246,15 +247,15 @@ struct Step1View: View {
             }
         }
     }
- 
+    
     // MARK: - Helpers
- 
+    
     private func selectSuggestion(_ suggestion: MKLocalSearchCompletion) {
         searchFieldFocused = false
         showSuggestions = false
         locationQuery = suggestion.title + (suggestion.subtitle.isEmpty ? "" : ", \(suggestion.subtitle)")
         isResolvingLocation = true
- 
+        
         LocationDetailFetcher.fetch(completion: suggestion) { coord, placemark in
             DispatchQueue.main.async {
                 isResolvingLocation = false
@@ -264,32 +265,32 @@ struct Step1View: View {
             }
         }
     }
- 
+    
     private func applyPlacemark(_ placemark: CLPlacemark?, coordinate: CLLocationCoordinate2D) {
         userCoordinate = coordinate
         locationConfirmed = true
- 
+        
         // Auto-fill from placemark
         stateName = placemark?.administrativeArea ?? ""          // e.g. "Punjab"
         city = placemark?.locality
-            ?? placemark?.subAdministrativeArea
-            ?? ""                                                 // e.g. "Chandigarh"
+        ?? placemark?.subAdministrativeArea
+        ?? ""                                                 // e.g. "Chandigarh"
         pincode = placemark?.postalCode ?? ""                     // e.g. "160017"
         locality = placemark?.subLocality
-            ?? placemark?.thoroughfare
-            ?? ""                                                  // e.g. "Sector 17"
- 
+        ?? placemark?.thoroughfare
+        ?? ""                                                  // e.g. "Sector 17"
+        
         if locationQuery.isEmpty {
             locationQuery = [locality, city, stateName]
                 .filter { !$0.isEmpty }
                 .joined(separator: ", ")
         }
     }
- 
+    
     private func requestCurrentLocation() {
         locationManager.requestLocation()
     }
- 
+    
     private func clearSearch() {
         locationQuery = ""
         showSuggestions = false
@@ -302,24 +303,24 @@ struct Step1View: View {
         searchManager.suggestions = []
     }
 }
- 
+
 // MARK: - Suggestion Row
 struct SuggestionRow: View {
     let suggestion: MKLocalSearchCompletion
- 
+    
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "mappin.circle.fill")
                 .font(.system(size: 16))
                 .foregroundStyle(Color(hex: "#4F5BDB"))
                 .frame(width: 28)
- 
+            
             VStack(alignment: .leading, spacing: 2) {
                 Text(suggestion.title)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color(hex: "#0D0F2B"))
                     .lineLimit(1)
- 
+                
                 if !suggestion.subtitle.isEmpty {
                     Text(suggestion.subtitle)
                         .font(.system(size: 12))
@@ -327,7 +328,7 @@ struct SuggestionRow: View {
                         .lineLimit(1)
                 }
             }
- 
+            
             Spacer()
         }
         .padding(.horizontal, 14)
@@ -335,30 +336,30 @@ struct SuggestionRow: View {
         .contentShape(Rectangle())
     }
 }
- 
+
 // MARK: - Auto Filled Field (read-only display after selection)
 struct AutoFilledField: View {
     let label: String
     let value: String
     let icon: String
- 
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label.uppercased())
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(Color(hex: "#9499C4"))
                 .tracking(0.8)
- 
+            
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 13))
                     .foregroundStyle(value.isEmpty ? Color(hex: "#C8CCEE") : Color(hex: "#4F5BDB"))
- 
+                
                 Text(value.isEmpty ? "—" : value)
                     .font(.system(size: 14, weight: value.isEmpty ? .regular : .medium))
                     .foregroundStyle(value.isEmpty ? Color(hex: "#C8CCEE") : Color(hex: "#0D0F2B"))
                     .lineLimit(1)
- 
+                
                 Spacer()
             }
             .padding(.horizontal, 12)
@@ -379,4 +380,4 @@ struct AutoFilledField: View {
         .frame(maxWidth: .infinity)
     }
 }
- 
+

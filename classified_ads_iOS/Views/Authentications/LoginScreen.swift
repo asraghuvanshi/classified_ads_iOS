@@ -15,85 +15,83 @@ struct LoginScreen: View {
     @State private var isRedirectToSignup = false
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AppGradient.surfaceSubtle.ignoresSafeArea()
-                
-                GeometryReader { geo in
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 0) {
+        ZStack {
+            AppGradient.surfaceSubtle.ignoresSafeArea()
+            
+            GeometryReader { geo in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        
+                        LogoSectionView(title: "Welcome Back", subtitle: "Sign in to continue")
+                        
+                        // Form
+                        VStack(spacing: 16) {
+                            FloatingField(
+                                label: "Email Address",
+                                placeholder: "you@example.com",
+                                icon: "envelope.fill",
+                                text: $email,
+                                keyboardType: .emailAddress
+                            )
                             
-                            LogoSectionView(title: "Welcome Back", subtitle: "Sign in to continue")
+                            FloatingField(
+                                label: "Password",
+                                placeholder: "Enter password",
+                                icon: "lock.fill",
+                                text: $password,
+                                isSecure: true
+                            )
                             
-                            // Form
-                            VStack(spacing: 16) {
-                                FloatingField(
-                                    label: "Email Address",
-                                    placeholder: "you@example.com",
-                                    icon: "envelope.fill",
-                                    text: $email,
-                                    keyboardType: .emailAddress
-                                )
-                                
-                                FloatingField(
-                                    label: "Password",
-                                    placeholder: "Enter password",
-                                    icon: "lock.fill",
-                                    text: $password,
-                                    isSecure: true
-                                )
-                                
-                                HStack {
-                                    Spacer()
-                                    Button("Forgot Password?") {}
-                                        .font(AppFont.body(13, weight: .medium))
-                                        .foregroundStyle(Color.brandAccent)
-                                }
-                                
-                                PrimaryButton("Sign In", icon: "arrow.right", isLoading: isLoading) {
-                                    isLoading = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                                        isLoading = false
-                                    }
-                                }
-                                
-                                HStack {
-                                    Rectangle().fill(Color.textTertiary.opacity(0.3)).frame(height: 0.5)
-                                    Text("or continue with")
-                                        .font(AppFont.body(12))
-                                        .foregroundStyle(Color.textTertiary)
-                                    Rectangle().fill(Color.textTertiary.opacity(0.3)).frame(height: 0.5)
-                                }
-                                
-                                HStack(spacing: 12) {
-                                    SocialLoginButton(icon: "apple.logo", label: "Apple") {}
-                                    SocialLoginButton(icon: "g.circle.fill", label: "Google") {}
-                                }
-                                
-                                HStack(spacing: 4) {
-                                    Text("Don't have an account?")
-                                        .font(AppFont.body(14))
-                                        .foregroundStyle(Color.textSecondary)
-                                    
-                                    Button("Sign Up") {
-                                        isRedirectToSignup = true
-                                    }
-                                    .font(AppFont.heading(14))
+                            HStack {
+                                Spacer()
+                                Button("Forgot Password?") {}
+                                    .font(AppFont.body(13, weight: .medium))
                                     .foregroundStyle(Color.brandAccent)
-                                }
-                                .padding(.top, 4)
                             }
-                            .padding(.horizontal, 24)
-                            .padding(.top, 28)
-                            .padding(.bottom, 40)
+                            
+                            PrimaryButton("Sign In", icon: "arrow.right", isLoading: isLoading) {
+                                isLoading = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                                    isLoading = false
+                                }
+                            }
+                            
+                            HStack {
+                                Rectangle().fill(Color.textTertiary.opacity(0.3)).frame(height: 0.5)
+                                Text("or continue with")
+                                    .font(AppFont.body(12))
+                                    .foregroundStyle(Color.textTertiary)
+                                Rectangle().fill(Color.textTertiary.opacity(0.3)).frame(height: 0.5)
+                            }
+                            
+                            HStack(spacing: 12) {
+                                SocialLoginButton(icon: "apple.logo", label: "Apple") {}
+                                SocialLoginButton(icon: "g.circle.fill", label: "Google") {}
+                            }
+                            
+                            HStack(spacing: 4) {
+                                Text("Don't have an account?")
+                                    .font(AppFont.body(14))
+                                    .foregroundStyle(Color.textSecondary)
+                                
+                                Button("Sign Up") {
+                                    isRedirectToSignup = true
+                                }
+                                .font(AppFont.heading(14))
+                                .foregroundStyle(Color.brandAccent)
+                            }
+                            .padding(.top, 4)
                         }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 28)
+                        .padding(.bottom, 40)
                     }
                 }
             }
-            .navigationBarHidden(true)
-            .navigationDestination(isPresented: $isRedirectToSignup) {
-                SignupScreen()
-            }
+        }
+        .navigationBarHidden(true)
+        .navigationDestination(isPresented: $isRedirectToSignup) {
+            SignupScreen()
         }
     }
 }

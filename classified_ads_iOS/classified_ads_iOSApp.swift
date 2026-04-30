@@ -27,13 +27,19 @@ struct RootView: View {
         Group {
             if !appState.didFinishSplash {
                 SplashScreen()
+            } else if appState.isLoggedIn {
+                MainTabView()
             } else {
-                if appState.isLoggedIn {
-                    LoginScreen()
-                } else {
-                    LoginScreen()
-                }
+                AuthFlowView()
             }
+        }
+    }
+}
+
+struct AuthFlowView: View {
+    var body: some View {
+        NavigationStack {
+            LoginScreen()
         }
     }
 }

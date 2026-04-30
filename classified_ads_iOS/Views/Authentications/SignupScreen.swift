@@ -27,9 +27,11 @@ struct SignupScreen: View {
     @State private var resendTimer: Int = 0
     @State private var canResend = false
     @State private var keyboardHeight: CGFloat = 0
-  
-     @State private var userCoordinate: CLLocationCoordinate2D?
-
+    
+    @State private var userCoordinate: CLLocationCoordinate2D?
+    @EnvironmentObject var appState: AppState
+    
+    
     private var otpDigits: [String] {
         let chars = Array(enteredOTP.prefix(6))
         return (0..<6).map { i in i < chars.count ? String(chars[i]) : "" }
@@ -224,6 +226,8 @@ struct SignupScreen: View {
     
     private func handleSignUp() {
         // Handle sign up
+        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        appState.isLoggedIn = true
         print("Sign up completed")
     }
 }
@@ -340,7 +344,7 @@ struct Step2View: View {
     @State private var agreedToTerms = false
     @State private var agreedToPricing = false
     @State private var confirmedAge = false
-    
+    @FocusState private var isOTPFocused: Bool
     var allAgreements: Bool {
         agreedToTerms && agreedToPricing && confirmedAge
     }
@@ -367,15 +371,16 @@ struct Step2View: View {
                 .background(
                     TextField("", text: $enteredOTP)
                         .keyboardType(.numberPad)
-                        .frame(width: 0, height: 0)
-                        .opacity(0)
+                        .focused($isOTPFocused)
+                        .frame(width: 1, height: 1)
+                        .opacity(0.01)
                         .onChange(of: enteredOTP) { _, newValue in
                             let filtered = newValue.filter { $0.isNumber }
                             enteredOTP = String(filtered.prefix(6))
                         }
                 )
                 .onTapGesture {
-                    UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
+                    isOTPFocused = true
                 }
                 
                 // Resend
