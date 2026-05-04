@@ -83,11 +83,11 @@ struct SignupScreen: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(stepTitle)
                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color(hex: "#0D0F2B"))
+                        .foregroundStyle(Color.textPrimary)
                     
                     Text(stepSubtitle)
                         .font(.system(size: 14))
-                        .foregroundStyle(Color(hex: "#9499C4"))
+                        .foregroundStyle(Color.textTertiary)
                 }
                 
                 Spacer()
@@ -98,7 +98,7 @@ struct SignupScreen: View {
             HStack(spacing: 8) {
                 ForEach(0..<3) { i in
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(step >= i ? Color(hex: "#4F5BDB") : Color(hex: "#E8EAFF"))
+                        .fill(step >= i ? Color.statusInfo : Color(hex: "#E8EAFF"))
                         .frame(height: 4)
                         .frame(width: step == i ? 32 : 24)
                         .animation(.spring(response: 0.4), value: step)
@@ -108,7 +108,7 @@ struct SignupScreen: View {
             
             Text("Step \(step + 1) of 3")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color(hex: "#9499C4"))
+                .foregroundStyle(Color.textTertiary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.horizontal, 12)
         }
@@ -298,11 +298,11 @@ struct Step0View: View {
             HStack(spacing: 8) {
                 Image(systemName: "lock.shield.fill")
                     .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "#00C9A7"))
+                    .foregroundStyle(Color.statusSuccess)
                 
                 Text("Your data is encrypted and never shared")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color(hex: "#5A5F8A"))
+                    .foregroundStyle(Color.textSecondary)
                 
                 Spacer()
             }
@@ -320,11 +320,11 @@ struct Step0View: View {
             HStack(spacing: 4) {
                 Text("Already have an account?")
                     .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "#9499C4"))
+                    .foregroundStyle(Color.textTertiary)
                 
                 Button("Sign in") { }
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color(hex: "#4F5BDB"))
+                    .foregroundStyle(Color.statusInfo)
             }
         }
     }
@@ -355,7 +355,7 @@ struct Step2View: View {
             VStack(spacing: 16) {
                 Text("6-DIGIT CODE")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(Color(hex: "#9499C4"))
+                    .foregroundStyle(Color.textTertiary)
                     .tracking(1.5)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -387,14 +387,14 @@ struct Step2View: View {
                 HStack(spacing: 4) {
                     Text("Didn't get it?")
                         .font(.system(size: 12))
-                        .foregroundStyle(Color(hex: "#9499C4"))
+                        .foregroundStyle(Color.textTertiary)
                     
                     if canResend {
                         Button("Resend Code") {
                             onResend()
                         }
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Color(hex: "#4F5BDB"))
+                        .foregroundStyle(Color.brandAccent)
                     } else {
                         Text("Resend in \(resendTimer)s")
                             .font(.system(size: 12, weight: .semibold))
@@ -411,27 +411,27 @@ struct Step2View: View {
             VStack(spacing: 20) {
                 Text("BEFORE YOU JOIN")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(Color(hex: "#9499C4"))
+                    .foregroundStyle(Color.textTertiary)
                     .tracking(1.5)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 AgreementRow(
                     icon: "doc.text.fill",
-                    color: Color(hex: "#4F5BDB"),
+                    color: Color.statusInfo,
                     text: "I agree to the Terms of Service and Privacy Policy",
                     isChecked: $agreedToTerms
                 )
                 
                 AgreementRow(
                     icon: "indianrupeesign.circle.fill",
-                    color: Color(hex: "#FF6B35"),
+                    color: Color.accentOrange,
                     text: "Each ad post costs ₹10 — I understand this pricing",
                     isChecked: $agreedToPricing
                 )
                 
                 AgreementRow(
                     icon: "person.badge.shield.checkmark.fill",
-                    color: Color(hex: "#00C9A7"),
+                    color: Color.accentTeal,
                     text: "I confirm I am 18 years of age or older",
                     isChecked: $confirmedAge
                 )
@@ -464,11 +464,11 @@ struct PasswordRequirement: View {
         HStack(spacing: 4) {
             Image(systemName: isMet ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 10))
-                .foregroundStyle(isMet ? Color(hex: "#00C9A7") : Color(hex: "#C8CCEE"))
+                .foregroundStyle(isMet ? Color.statusSuccess : Color(hex: "#C8CCEE"))
             
             Text(text)
                 .font(.system(size: 11))
-                .foregroundStyle(isMet ? Color(hex: "#5A5F8A") : Color(hex: "#C8CCEE"))
+                .foregroundStyle(isMet ? Color.textSecondary : Color(hex: "#C8CCEE"))
         }
     }
 }

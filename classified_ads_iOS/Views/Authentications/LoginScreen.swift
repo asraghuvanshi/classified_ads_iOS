@@ -13,7 +13,8 @@ struct LoginScreen: View {
     @State private var password = ""
     @State private var isLoading = false
     @State private var isRedirectToSignup = false
-    
+    @State private var isForgotPassword = false
+
     var body: some View {
         ZStack {
             AppGradient.surfaceSubtle.ignoresSafeArea()
@@ -44,7 +45,9 @@ struct LoginScreen: View {
                             
                             HStack {
                                 Spacer()
-                                Button("Forgot Password?") {}
+                                Button("Forgot Password?") {
+                                    isForgotPassword = true
+                                }
                                     .font(AppFont.body(13, weight: .medium))
                                     .foregroundStyle(Color.brandAccent)
                             }
@@ -92,6 +95,9 @@ struct LoginScreen: View {
         .navigationBarHidden(true)
         .navigationDestination(isPresented: $isRedirectToSignup) {
             SignupScreen()
+        }
+        .navigationDestination(isPresented: $isForgotPassword) {
+            ForgotPasswordScreen()
         }
     }
 }
